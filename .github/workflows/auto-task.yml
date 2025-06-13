@@ -1,0 +1,29 @@
+name: Automatical Synchornization
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  syncTask:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "Actions Runner"
+          git config --global user.email "git@github.com"
+
+      - name: Setup Dependencies
+        run: npm i
+
+      - name: Start Synchronization Task
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          REPO: "${{ github.repository }}"
+        run: npm run start
