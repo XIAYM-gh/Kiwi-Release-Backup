@@ -1,4 +1,4 @@
-import { createReadStream, createWriteStream, existsSync, unlinkSync } from 'node:fs';
+import { createReadStream, createWriteStream, existsSync, statSync, unlinkSync } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import axios from 'axios';
 
@@ -28,9 +28,8 @@ export async function upload(url: string, inputPath: string): Promise<void> {
 		headers: {
 			Authorization: `Bearer ${process.env.GH_TOKEN}`,
 			'User-Agent': 'Kiwi-Release-Backup-Client/0.0.1',
-			'Content-Type': 'application/octet-stream'
-		},
-		maxContentLength: Infinity,
-		maxBodyLength: Infinity
+			'Content-Type': 'application/octet-stream',
+			'Content-Length': statSync(inputPath).size
+		}
 	});
 }
