@@ -60,7 +60,7 @@ for (let release of releases) {
 		console.log('  Downloaded successfully.');
 
 		await upload(
-			`https://uploads.github.com/repos/kiwibrowser/src.next/releases/${releaseId}/assets?name=${encodeURIComponent(asset.name)}`,
+			`https://uploads.github.com/repos/${THIS_REPO}/releases/${releaseId}/assets?name=${encodeURIComponent(asset.name)}`,
 			asset.name
 		);
 		console.log('  Uploaded successfully.');
