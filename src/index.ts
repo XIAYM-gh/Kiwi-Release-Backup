@@ -1,24 +1,12 @@
 import { download, upload } from './asset-io';
 import { doRequest, getAuthorization } from './request';
-import * as fs from 'node:fs';
+import { $, execa } from 'execa';
 
 const KIWI_REPO = 'kiwibrowser/src.next';
 const THIS_REPO = process.env.REPO ?? 'XIAYM-gh/Kiwi-Release-Backup';
 
 const thisReleases = <any[]>await doRequest(`/repos/${THIS_REPO}/releases`);
-const lastCommitHash = (
-	await doRequest(`/repos/${THIS_REPO}/commits`, {
-		query: {
-			per_page: 1
-		}
-	})
-)[0].sha;
-
-const thisTags = <string[]>(<any[]>await doRequest(`/repos/${THIS_REPO}/tags`, {
-	query: {
-		per_page: 100
-	}
-})).map(it => it.name);
+const thisTags = (await execa('git', ['tag'])).stdout.trim().split('\n');
 
 // Tag Name: string => Release Object
 const presentReleases = Object.fromEntries(
@@ -46,18 +34,9 @@ for (let release of releases) {
 	if (getAuthorization() && !presentReleases[release.tag_name]) {
 		// Create a tag
 		if (!thisTags[release.tag_name]) {
-			await doRequest(`/repos/${THIS_REPO}/git/tags`, {
-				body: {
-					tag: release.tag_name,
-					message: 'Auto created :D',
-					object: lastCommitHash,
-					type: 'commit',
-					tagger: {
-						name: 'Actions Runner',
-						email: 'git@github.com'
-					}
-				}
-			});
+			await execa('git', ['tag', release.tag_name]);
+			await execa('git', ['remote', 'set-url', 'origin', `https://oauth2:${process.env.GH_TOKEN}@github.com/${THIS_REPO}`]);
+			await execa('git', ['push', '--tags', '--set-upstream', 'main']);
 		}
 
 		// Copy the release
