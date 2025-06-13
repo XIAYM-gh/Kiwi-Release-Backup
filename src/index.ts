@@ -6,11 +6,13 @@ const KIWI_REPO = 'kiwibrowser/src.next';
 const THIS_REPO = process.env.REPO ?? 'XIAYM-gh/Kiwi-Release-Backup';
 
 const thisReleases = <any[]>await doRequest(`/repos/${THIS_REPO}/releases`);
-const lastCommitHash = await doRequest(`/repos/${THIS_REPO}/commits`, {
-	query: {
-		per_page: 1
-	}
-})[0].sha;
+const lastCommitHash = (
+	await doRequest(`/repos/${THIS_REPO}/commits`, {
+		query: {
+			per_page: 1
+		}
+	})
+)[0].sha;
 
 const thisTags = <string[]>(<any[]>await doRequest(`/repos/${THIS_REPO}/tags`, {
 	query: {
