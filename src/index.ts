@@ -36,7 +36,7 @@ for (let release of releases) {
 		if (!thisTags[release.tag_name]) {
 			await execa('git', ['tag', release.tag_name]);
 			await execa('git', ['remote', 'set-url', 'origin', `https://oauth2:${process.env.GH_TOKEN}@github.com/${THIS_REPO}`]);
-			await execa('git', ['push', '--tags', '--set-upstream', 'main']);
+			await execa('git', ['push', '--tags', '--set-upstream', 'origin', 'main']);
 		}
 
 		// Copy the release
