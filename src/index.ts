@@ -1,12 +1,10 @@
 import { download, upload } from './asset-io';
 import { doRequest, getAuthorization } from './request';
-import { $, execa } from 'execa';
 
 const KIWI_REPO = 'kiwibrowser/src.next';
 const THIS_REPO = process.env.REPO ?? 'XIAYM-gh/Kiwi-Release-Backup';
 
 const thisReleases = <any[]>await doRequest(`/repos/${THIS_REPO}/releases`);
-const thisTags = (await execa('git', ['tag'])).stdout.trim().split('\n');
 
 // Tag Name: string => Release Object
 const presentReleases = Object.fromEntries(
@@ -32,13 +30,6 @@ for (let release of releases) {
 
 	console.log('Processing release #' + release.tag_name);
 	if (getAuthorization() && !presentReleases[release.tag_name]) {
-		// Create a tag
-		if (!thisTags[release.tag_name]) {
-			await execa('git', ['tag', release.tag_name]);
-			await execa('git', ['remote', 'set-url', 'origin', `https://oauth2:${process.env.GH_TOKEN}@github.com/${THIS_REPO}`]);
-			await execa('git', ['push', '--tags', '--set-upstream', 'origin', 'main']);
-		}
-
 		// Copy the release
 		const created = await doRequest(`/repos/${THIS_REPO}/releases`, {
 			body: {
@@ -52,7 +43,7 @@ for (let release of releases) {
 					'\n',
 					release.body
 				].join('\n'),
-				make_latest: false
+				make_latest: "false"
 			}
 		});
 
