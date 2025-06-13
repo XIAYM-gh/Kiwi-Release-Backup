@@ -46,25 +46,18 @@ for (let release of releases) {
 	if (getAuthorization() && !presentReleases[release.tag_name]) {
 		// Create a tag
 		if (!thisTags[release.tag_name]) {
-			try {
-				await doRequest(`/repos/${THIS_REPO}/git/tags`, {
-					body: {
-						tag: release.tag_name,
-						message: 'Auto created :D',
-						object: lastCommitHash,
-						type: 'commit',
-						tagger: {
-							name: 'Actions Runner',
-							email: 'git@github.com'
-						}
+			await doRequest(`/repos/${THIS_REPO}/git/tags`, {
+				body: {
+					tag: release.tag_name,
+					message: 'Auto created :D',
+					object: lastCommitHash,
+					type: 'commit',
+					tagger: {
+						name: 'Actions Runner',
+						email: 'git@github.com'
 					}
-				});
-			} catch (err) {
-				// Conflict - this shouldn't happen
-				if (!err.includes('409')) {
-					throw err;
 				}
-			}
+			});
 		}
 
 		// Copy the release
